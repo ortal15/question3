@@ -1,0 +1,77 @@
+א. הצג את כל הצירופים האפשריים בין תיירים לבין טיולים, גם אם אין להם שיוך ישיר:
+
+SELECT tourists.first_name, tourists.last_name, tours.tour_name
+FROM tourists
+LEFT JOIN tours ON tourists.tour_id = tours.id
+
+UNION
+
+SELECT tourists.first_name, tourists.last_name, tours.tour_name
+FROM tourists
+RIGHT JOIN tours ON tourists.tour_id = tours.id;
+
+
+ב. הצג את רשימת התיירים שלא שובצו לאף טיול
+בנוסף, כתוב שאילתת מחיקה שתסיר תייר כלשהו שלא נרשם לשום טיול:
+
+SELECT ts.first_name , ts.last_name
+FROM tourists ts
+left JOIN tours t on  ts.tour_id = t.id
+WHERE t.id is NULL;
+
+DELETE FROM tourists WHERE tour_id IS NULL ;
+
+
+ג. הצג את רשימת הטיולים שאין בהם אף תייר משובץ
++ בנוסף, כדי לאפשר לתיירים להירשם, כתוב שאילתת UPDATE- שתעדכן את תאריכי
+הטיולים )שאין להם נרשמים ( והזז אותם שנה קדימה , לשנת 2026:
+
+SELECT t.tour_name
+FROM tours t
+left JOIN tourists  ts on  ts.tour_id = t.id
+WHERE ts.id is NULL;
+
+UPDATE tours
+SET start_date = DATE(start_date, '+1 year'),
+    end_date = DATE(end_date, '+1 year')
+WHERE id NOT IN (SELECT DISTINCT tour_id FROM tourists WHERE tour_id IS NOT NULL);
+
+
+ד. חשב את מספר הטיולים שאין בהם אף תייר רשום )אפילו לא אחד(:
+
+SELECT count(t.tour_name)
+FROM tours t
+left JOIN tourists  ts on  ts.tour_id = t.id
+WHERE ts.id is NULL;
+
+
+ה. הצג את רשימת כל התיירים ואת פרטי הטיולים שלהם, כאשר תיירים לא משובצים
+יופיעו עם ערכי NULL בטור פרטי הטיול:
+
+SELECT *
+FROM tourists ts
+LEFT JOIN tours t on ts.tour_id = t.id
+ORDER by t.id is NULL
+
+ו. הצג את רשימת התיירים יחד עם המדינות מהן הגיעו )רמז: JOIN INNER ):
+
+SELECT *
+FROM tourists ts
+INNER JOIN countries c on ts.country_id = c.id
+;
+
+
+ז. הצג את רשימת התיירים המשובצים לטיולים, כולל את פרטי הטיול אך רק לתיירים
+ששובצו בפועל:
+
+SELECT *
+FROM tourists ts
+LEFT JOIN tours t on ts.tour_id = t.id
+WHERE ts.tour_id = t.id
+
+ח. הצג את רשימת כל התיירים ואת פרטי הטיולים אליהם הם משובצים, וגם את רשימת
+כל הטיולים עם פרטי התיירים:
+
+SELECT * FROM tourists ts
+FULL JOIN tours t on t.id = ts.tour_id
+ORDER by t.id
